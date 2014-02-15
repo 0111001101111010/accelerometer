@@ -1,5 +1,7 @@
 package com.example.accelerometer;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.os.Bundle;
 
@@ -10,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.*;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,9 +21,13 @@ public class MyActivity extends Activity implements SensorEventListener {
     private boolean mInitialized;
 
     private SensorManager mSensorManager;
-
+    public String[] name = {"x_move", "y_move", "z_move"};
+    public String current = null; //movement
+    public String last 	  = null; // movement
+    public ArrayList<String> history = new ArrayList<String>();
+    public String[] gestureKey = {"knock", "shakeX", "shakeY"};
+    public String gesture = "initalized";// two movements = one gesture 
     private Sensor mAccelerometer;
-
     private final float NOISE = (float) 2.0;
 
     /** Called when the activity is first created. */
@@ -54,6 +61,7 @@ public class MyActivity extends Activity implements SensorEventListener {
         TextView tvX= (TextView)findViewById(R.id.x_axis);
         TextView tvY= (TextView)findViewById(R.id.y_axis);
         TextView tvZ= (TextView)findViewById(R.id.z_axis);
+        TextView movement= (TextView)findViewById(R.id.editText1);
         ImageView iv = (ImageView)findViewById(R.id.image);
         float x = event.values[0];
         float y = event.values[1];
@@ -65,6 +73,7 @@ public class MyActivity extends Activity implements SensorEventListener {
             tvX.setText("0.0");
             tvY.setText("0.0");
             tvZ.setText("0.0");
+            movement.setText(gesture);//if nothing in the beginning then nothing
             mInitialized = true;
         } else {
             float deltaX = Math.abs(mLastX - x);
@@ -80,12 +89,52 @@ public class MyActivity extends Activity implements SensorEventListener {
             tvY.setText(Float.toString(deltaY));
             tvZ.setText(Float.toString(deltaZ));
             iv.setVisibility(View.VISIBLE);
+            /**
+             * Do movement calculation of current gesture
+             * 
+             */
+            /*
+            if ((deltaX >deltaY)){//||(mLastX >mLastZ)){
+            	//this is a x-plane shake
+            	current =gestureKey[1];
+                movement.setText(current);
+            }
+            else if ((mLastY >mLastX)||(mLastY >mLastZ)){
+            	//this is a y-plane shake
+            	current =gestureKey[2];
+            }
+            else if ((mLastZ >mLastX)||(mLastZ >mLastY)){
+            	//this is a knock 
+            	current =gestureKey[0];
+            }*/
+            /***
+             * The X,Y,Z
+             * compare lastGesture to Current gesture if correct set 
+             * public String[] gesture = {"knock", "shakeX", "shakeY"};
+             */
+            /*
+            if (current ==last){
+            	gesture = current;
+            }*
+            
+            movement.setText(gesture);
+            /** set the arrows**/
             if (deltaX > deltaY) {
                 iv.setImageResource(R.drawable.shaker_fig_1);
+                current = gestureKey[1];//   
+                
             } else if (deltaY > deltaX) {
                 iv.setImageResource(R.drawable.shaker_fig_2);
+                current = gestureKey[2];//     
             } else {
                 iv.setVisibility(View.INVISIBLE);
+                current =gestureKey[0];//   
+            }
+            movement.setText(current);//   
+            history.add(current) ;
+
+            for (String motion : history){
+                Log.i("Member name: ", motion);
             }
         }
     }
